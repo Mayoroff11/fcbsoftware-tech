@@ -1,61 +1,36 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 export const BlockchainOverlay: React.FC = () => {
-  const [scrollY, setScrollY] = useState(0);
-
-  useEffect(() => {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
-
-    let ticking = false;
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setScrollY(window.scrollY);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
       {/* =========================================================
-          LAYER 2 — LARGE SOFT ATMOSPHERIC LIGHT BLOBS (Parallaxed)
+          LAYER 2 — LARGE SOFT ATMOSPHERIC LIGHT BLOBS (Hardware Accelerated)
          ========================================================= */}
       {/* Top Center Hero Light Blob */}
       <div
-        style={{ transform: `translate3d(0, ${scrollY * 0.08}px, 0)` }}
-        className="absolute -top-40 left-1/2 -translate-x-1/2 w-[1000px] h-[650px] bg-gradient-to-b from-violet-400/30 via-purple-300/20 to-transparent blur-[140px] rounded-full animate-pulse-subtle"
+        className="absolute -top-40 left-1/2 -translate-x-1/2 w-[1000px] max-w-[140vw] h-[650px] bg-gradient-to-b from-violet-400/25 via-purple-300/15 to-transparent blur-[120px] rounded-full animate-pulse-subtle will-change-transform"
       />
 
       {/* Right Atmosphere Bloom */}
       <div
-        style={{ transform: `translate3d(0, ${scrollY * -0.05}px, 0)` }}
-        className="absolute top-[20%] -right-48 w-[800px] h-[800px] bg-gradient-to-bl from-indigo-300/25 via-violet-200/20 to-transparent blur-[130px] rounded-full animate-float-slow"
+        className="absolute top-[20%] -right-48 w-[750px] max-w-[120vw] h-[750px] bg-gradient-to-bl from-indigo-300/20 via-violet-200/15 to-transparent blur-[110px] rounded-full animate-float-slow will-change-transform"
       />
 
       {/* Left Center Atmosphere Bloom */}
       <div
-        style={{ transform: `translate3d(0, ${scrollY * 0.04}px, 0)` }}
-        className="absolute top-[50%] -left-48 w-[850px] h-[850px] bg-gradient-to-tr from-purple-300/30 via-lavender-200/25 to-transparent blur-[140px] rounded-full animate-float-reverse"
+        className="absolute top-[50%] -left-48 w-[800px] max-w-[120vw] h-[800px] bg-gradient-to-tr from-purple-300/20 via-lavender-200/15 to-transparent blur-[120px] rounded-full animate-float-reverse will-change-transform"
       />
 
       {/* Bottom Glow */}
       <div
-        style={{ transform: `translate3d(0, ${scrollY * -0.03}px, 0)` }}
-        className="absolute top-[80%] left-1/3 w-[900px] h-[700px] bg-gradient-to-t from-violet-400/20 via-indigo-200/15 to-transparent blur-[150px] rounded-full"
+        className="absolute top-[80%] left-1/3 w-[850px] max-w-[130vw] h-[650px] bg-gradient-to-t from-violet-400/15 via-indigo-200/10 to-transparent blur-[130px] rounded-full will-change-transform"
       />
 
       {/* =========================================================
           LAYER 4 — DIGITAL TECHNICAL GRID
          ========================================================= */}
       <div
-        className="absolute inset-0 opacity-[0.45]"
+        className="absolute inset-0 opacity-[0.35]"
         style={{
           backgroundImage: `
             linear-gradient(to right, rgba(139, 92, 246, 0.07) 1px, transparent 1px),
@@ -71,9 +46,8 @@ export const BlockchainOverlay: React.FC = () => {
           LAYER 3 — BLOCKCHAIN DISTRIBUTED NETWORK OVERLAY
          ========================================================= */}
       <svg
-        className="absolute inset-0 w-full h-full opacity-60 text-violet-600"
+        className="absolute inset-0 w-full h-full opacity-50 text-violet-600"
         xmlns="http://www.w3.org/2000/svg"
-        style={{ transform: `translate3d(0, ${scrollY * 0.02}px, 0)` }}
       >
         <defs>
           <pattern
@@ -150,8 +124,7 @@ export const BlockchainOverlay: React.FC = () => {
          ========================================================= */}
       {/* Abstract Translucent Isometric Cube 1 (Top Left) */}
       <div
-        style={{ transform: `translate3d(0, ${scrollY * -0.06}px, 0)` }}
-        className="absolute top-36 left-8 sm:left-24 w-32 h-32 opacity-35 pointer-events-none hidden lg:block animate-float-slow"
+        className="absolute top-36 left-8 sm:left-24 w-32 h-32 opacity-35 pointer-events-none hidden lg:block animate-float-slow will-change-transform"
       >
         <svg viewBox="0 0 100 100" className="w-full h-full text-violet-500">
           {/* Top Face */}
@@ -167,8 +140,7 @@ export const BlockchainOverlay: React.FC = () => {
 
       {/* Abstract Hexagonal Ring (Center Right) */}
       <div
-        style={{ transform: `translate3d(0, ${scrollY * 0.05}px, 0)` }}
-        className="absolute top-[42%] -right-10 sm:right-16 w-44 h-44 opacity-30 pointer-events-none hidden md:block animate-float-reverse"
+        className="absolute top-[42%] -right-10 sm:right-16 w-44 h-44 opacity-30 pointer-events-none hidden md:block animate-float-reverse will-change-transform"
       >
         <svg viewBox="0 0 120 120" className="w-full h-full text-indigo-500">
           <polygon
@@ -192,8 +164,7 @@ export const BlockchainOverlay: React.FC = () => {
 
       {/* Abstract Layered Glass Cube 2 (Bottom Left) */}
       <div
-        style={{ transform: `translate3d(0, ${scrollY * -0.04}px, 0)` }}
-        className="absolute top-[75%] left-12 w-36 h-36 opacity-30 pointer-events-none hidden lg:block animate-float-slow"
+        className="absolute top-[75%] left-12 w-36 h-36 opacity-30 pointer-events-none hidden lg:block animate-float-slow will-change-transform"
       >
         <svg viewBox="0 0 100 100" className="w-full h-full text-violet-600">
           <polygon points="50,15 85,35 50,55 15,35" fill="rgba(255, 255, 255, 0.5)" stroke="currentColor" strokeWidth="0.8" />

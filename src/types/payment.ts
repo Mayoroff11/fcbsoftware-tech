@@ -58,12 +58,18 @@ export interface AssetConfig {
 export type PaymentStatus =
   | 'awaiting_payment'
   | 'payment_detected'
+  | 'verifying_payment'
   | 'confirming'
   | 'confirmed'
   | 'underpaid'
   | 'overpaid'
   | 'overpaid_manual_review'
-  | 'expired';
+  | 'manual_review'
+  | 'payment_not_yet_detected'
+  | 'invalid_transaction'
+  | 'transaction_already_used'
+  | 'expired'
+  | 'failed';
 
 export interface Invoice {
   id: string; // e.g. "FCB-883921"
@@ -84,6 +90,8 @@ export interface Invoice {
   createdAt: number;
   expiresAt: number;
   status: PaymentStatus;
+  customerEmail?: string;
+  customerOrganization?: string;
   transactionHash?: string;
   detectedAt?: number;
   confirmedAt?: number;
@@ -96,8 +104,32 @@ export interface Invoice {
   receivedAmount?: number;
   updatedAt: number;
   licenseHash?: string;
+  adminNotificationSent?: boolean;
+  adminNotificationSentAt?: number;
+  adminNotificationError?: string;
+  receiptFileName?: string;
+  receiptDataUrl?: string;
+  verificationMethod?: 'automatic' | 'customer_submitted';
+  verificationMessage?: string;
 }
 
 export interface ExchangeRates {
   [key: string]: number; // USD price per 1 unit of asset
+}
+
+export interface PaymentVerificationRequest {
+  invoiceId: string;
+  txHash: string;
+  customerEmail: string;
+  receiptFileName?: string;
+  receiptDataUrl?: string;
+}
+
+export interface PaymentVerificationResponse {
+  success: boolean;
+  status: PaymentStatus;
+  message: string;
+  invoice?: Invoice;
+  error?: string;
+  adminNotificationSent?: boolean;
 }

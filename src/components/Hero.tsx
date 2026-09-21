@@ -88,7 +88,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenLicense, onScrollToFeatures })
           {/* Main Headline */}
           <motion.h1
             variants={itemVariants}
-            className="text-4xl sm:text-5xl lg:text-[62px] font-extrabold tracking-[-0.035em] text-slate-900 leading-[1.08] font-display max-w-3xl mx-auto"
+            className="text-3xl min-[360px]:text-4xl sm:text-5xl lg:text-[62px] font-extrabold tracking-[-0.035em] text-slate-900 leading-[1.12] sm:leading-[1.08] font-display max-w-3xl mx-auto break-words"
           >
             Take Control of Your<br />
             <span className="bg-gradient-to-r from-violet-700 via-purple-700 to-indigo-700 bg-clip-text text-transparent drop-shadow-xs">

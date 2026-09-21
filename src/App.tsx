@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Navbar } from './components/Navbar.tsx';
 import { Hero } from './components/Hero.tsx';
 import { AboutSoftware } from './components/AboutSoftware.tsx';
@@ -7,19 +7,36 @@ import { Pricing } from './components/Pricing.tsx';
 import { Reviews } from './components/Reviews.tsx';
 import { FinalCta } from './components/FinalCta.tsx';
 import { Footer } from './components/Footer.tsx';
-import { LicenseModal } from './components/LicenseModal.tsx';
-import { SupportModal } from './components/SupportModal.tsx';
-import { ReportProblemModal } from './components/ReportProblemModal.tsx';
-import { DocumentationModal } from './components/DocumentationModal.tsx';
 import { BlockchainOverlay } from './components/BlockchainOverlay.tsx';
-import { RefundPolicy } from './components/RefundPolicy.tsx';
-import { DevelopmentTeam } from './components/DevelopmentTeam.tsx';
-import { Security } from './components/Security.tsx';
-import { PrivacyPolicy } from './components/PrivacyPolicy.tsx';
-import { PaymentPage } from './components/checkout/PaymentPage.tsx';
+import { SupportChatLauncher } from './components/SupportChatLauncher.tsx';
+import { Loader2 } from 'lucide-react';
+
+// Lazy load secondary route pages and modals to maximize initial page performance & minimize bundle size
+const PaymentPage = lazy(() => import('./components/checkout/PaymentPage.tsx').then(m => ({ default: m.PaymentPage })));
+const RefundPolicy = lazy(() => import('./components/RefundPolicy.tsx').then(m => ({ default: m.RefundPolicy })));
+const DevelopmentTeam = lazy(() => import('./components/DevelopmentTeam.tsx').then(m => ({ default: m.DevelopmentTeam })));
+const Security = lazy(() => import('./components/Security.tsx').then(m => ({ default: m.Security })));
+const PrivacyPolicy = lazy(() => import('./components/PrivacyPolicy.tsx').then(m => ({ default: m.PrivacyPolicy })));
+const LicenseModal = lazy(() => import('./components/LicenseModal.tsx').then(m => ({ default: m.LicenseModal })));
+const SupportModal = lazy(() => import('./components/SupportModal.tsx').then(m => ({ default: m.SupportModal })));
+const ReportProblemModal = lazy(() => import('./components/ReportProblemModal.tsx').then(m => ({ default: m.ReportProblemModal })));
+const DocumentationModal = lazy(() => import('./components/DocumentationModal.tsx').then(m => ({ default: m.DocumentationModal })));
+const NotFound = lazy(() => import('./components/NotFound.tsx').then(m => ({ default: m.NotFound })));
+
+// Lightweight Fallback Loading State
+const ViewFallbackLoader: React.FC = () => (
+  <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 space-y-4 text-center">
+    <div className="w-12 h-12 rounded-2xl bg-white/80 border border-violet-200/80 shadow-md flex items-center justify-center text-violet-600 backdrop-blur-xl animate-pulse">
+      <Loader2 className="w-6 h-6 animate-spin" />
+    </div>
+    <div className="text-xs font-semibold text-slate-600 font-display uppercase tracking-wider">
+      Loading FCB Platform Module...
+    </div>
+  </div>
+);
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'home' | 'refund-policy' | 'dev-team' | 'security' | 'privacy-policy' | 'checkout'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'refund-policy' | 'dev-team' | 'security' | 'privacy-policy' | 'checkout' | 'not-found'>('home');
   const [activeInvoiceId, setActiveInvoiceId] = useState<string | undefined>(undefined);
   const [licenseModalOpen, setLicenseModalOpen] = useState(false);
   const [selectedTierId, setSelectedTierId] = useState<string>('1m-personal');
@@ -57,6 +74,8 @@ export default function App() {
         hash === '#customer-privacy'
       ) {
         setCurrentView('privacy-policy');
+      } else if (hash === '#404' || hash === '#not-found') {
+        setCurrentView('not-found');
       } else {
         // Any other hash like #pricing, #about, #reviews, #demonstrations, #licenses, #hero or empty
         setCurrentView('home');
@@ -154,79 +173,83 @@ export default function App() {
       )}
 
       <main className="flex-1 relative z-10">
-        {currentView === 'checkout' ? (
-          <PaymentPage
-            initialPlanId={selectedTierId}
-            initialInvoiceId={activeInvoiceId}
-            onNavigateHome={() => handleNavigateHome('hero')}
-            onOpenPricing={() => handleNavigateHome('pricing')}
-            onOpenSecurity={handleOpenSecurity}
-            onOpenPrivacyPolicy={handleOpenPrivacyPolicy}
-            onOpenDevTeam={handleOpenDevTeam}
-            onOpenRefundPolicy={handleOpenRefundPolicy}
-            onOpenDocs={() => setDocsModalOpen(true)}
-            onOpenSupport={() => setSupportModalOpen(true)}
-          />
-        ) : currentView === 'refund-policy' ? (
-          <RefundPolicy
-            onOpenSupport={() => setSupportModalOpen(true)}
-            onNavigateHome={() => handleNavigateHome('hero')}
-            onOpenLicense={handleOpenLicense}
-          />
-        ) : currentView === 'dev-team' ? (
-          <DevelopmentTeam
-            onOpenSupport={() => setSupportModalOpen(true)}
-            onNavigateHome={() => handleNavigateHome('hero')}
-            onOpenDocs={() => setDocsModalOpen(true)}
-            onOpenSecurity={handleOpenSecurity}
-          />
-        ) : currentView === 'security' ? (
-          <Security
-            onOpenSupport={() => setSupportModalOpen(true)}
-            onNavigateHome={() => handleNavigateHome('hero')}
-            onOpenRefundPolicy={handleOpenRefundPolicy}
-            onOpenDocs={() => setDocsModalOpen(true)}
-            onOpenDevTeam={handleOpenDevTeam}
-            onOpenPrivacyPolicy={handleOpenPrivacyPolicy}
-          />
-        ) : currentView === 'privacy-policy' ? (
-          <PrivacyPolicy
-            onOpenSupport={() => setSupportModalOpen(true)}
-            onNavigateHome={() => handleNavigateHome('hero')}
-            onOpenRefundPolicy={handleOpenRefundPolicy}
-            onOpenSecurity={handleOpenSecurity}
-            onOpenDevTeam={handleOpenDevTeam}
-            onOpenDocs={() => setDocsModalOpen(true)}
-          />
-        ) : (
-          <>
-            {/* 2 & 3. Hero & Hero Feature Strip */}
-            <Hero
-              onOpenLicense={() => handleNavigateHome('pricing')}
+        <Suspense fallback={<ViewFallbackLoader />}>
+          {currentView === 'checkout' ? (
+            <PaymentPage
+              initialPlanId={selectedTierId}
+              initialInvoiceId={activeInvoiceId}
+              onNavigateHome={() => handleNavigateHome('hero')}
+              onOpenPricing={() => handleNavigateHome('pricing')}
+              onOpenSecurity={handleOpenSecurity}
+              onOpenPrivacyPolicy={handleOpenPrivacyPolicy}
+              onOpenDevTeam={handleOpenDevTeam}
+              onOpenRefundPolicy={handleOpenRefundPolicy}
+              onOpenDocs={() => setDocsModalOpen(true)}
+              onOpenSupport={() => setSupportModalOpen(true)}
             />
-
-            {/* 4. About FCB / Core Architecture */}
-            <AboutSoftware />
-
-            {/* 5. Video Demonstrations / See FCB in Action */}
-            <VideoDemos />
-
-            {/* 6. Pricing Section */}
-            <Pricing
+          ) : currentView === 'refund-policy' ? (
+            <RefundPolicy
+              onOpenSupport={() => setSupportModalOpen(true)}
+              onNavigateHome={() => handleNavigateHome('hero')}
               onOpenLicense={handleOpenLicense}
-              onOpenSupport={() => setSupportModalOpen(true)}
             />
-
-            {/* 7. Operator Reviews & Animated Statistics */}
-            <Reviews />
-
-            {/* 8. Final CTA ("Ready to Explore FCB?") */}
-            <FinalCta
-              onOpenLicense={() => handleNavigateHome('pricing')}
+          ) : currentView === 'dev-team' ? (
+            <DevelopmentTeam
               onOpenSupport={() => setSupportModalOpen(true)}
+              onNavigateHome={() => handleNavigateHome('hero')}
+              onOpenDocs={() => setDocsModalOpen(true)}
+              onOpenSecurity={handleOpenSecurity}
             />
-          </>
-        )}
+          ) : currentView === 'security' ? (
+            <Security
+              onOpenSupport={() => setSupportModalOpen(true)}
+              onNavigateHome={() => handleNavigateHome('hero')}
+              onOpenRefundPolicy={handleOpenRefundPolicy}
+              onOpenDocs={() => setDocsModalOpen(true)}
+              onOpenDevTeam={handleOpenDevTeam}
+              onOpenPrivacyPolicy={handleOpenPrivacyPolicy}
+            />
+          ) : currentView === 'privacy-policy' ? (
+            <PrivacyPolicy
+              onOpenSupport={() => setSupportModalOpen(true)}
+              onNavigateHome={() => handleNavigateHome('hero')}
+              onOpenRefundPolicy={handleOpenRefundPolicy}
+              onOpenSecurity={handleOpenSecurity}
+              onOpenDevTeam={handleOpenDevTeam}
+              onOpenDocs={() => setDocsModalOpen(true)}
+            />
+          ) : currentView === 'not-found' ? (
+            <NotFound onNavigateHome={() => handleNavigateHome('hero')} />
+          ) : (
+            <>
+              {/* 2 & 3. Hero & Hero Feature Strip */}
+              <Hero
+                onOpenLicense={() => handleNavigateHome('pricing')}
+              />
+
+              {/* 4. About FCB / Core Architecture */}
+              <AboutSoftware />
+
+              {/* 5. Video Demonstrations / See FCB in Action */}
+              <VideoDemos />
+
+              {/* 6. Pricing Section */}
+              <Pricing
+                onOpenLicense={handleOpenLicense}
+                onOpenSupport={() => setSupportModalOpen(true)}
+              />
+
+              {/* 7. Operator Reviews & Animated Statistics */}
+              <Reviews />
+
+              {/* 8. Final CTA ("Ready to Explore FCB?") */}
+              <FinalCta
+                onOpenLicense={() => handleNavigateHome('pricing')}
+                onOpenSupport={() => setSupportModalOpen(true)}
+              />
+            </>
+          )}
+        </Suspense>
       </main>
 
       {/* 9. Shared Footer */}
@@ -242,32 +265,45 @@ export default function App() {
         onNavigateHome={handleNavigateHome}
       />
 
-      {/* Interactive Modals */}
-      <LicenseModal
-        isOpen={licenseModalOpen}
-        onClose={() => setLicenseModalOpen(false)}
-        initialTierId={selectedTierId}
-        onProceedToCheckout={handleOpenLicense}
-      />
+      {/* Interactive Modals — Suspended for lazy loading */}
+      <Suspense fallback={null}>
+        {licenseModalOpen && (
+          <LicenseModal
+            isOpen={licenseModalOpen}
+            onClose={() => setLicenseModalOpen(false)}
+            initialTierId={selectedTierId}
+            onProceedToCheckout={handleOpenLicense}
+          />
+        )}
 
-      <SupportModal
-        isOpen={supportModalOpen}
-        onClose={() => setSupportModalOpen(false)}
-      />
+        {supportModalOpen && (
+          <SupportModal
+            isOpen={supportModalOpen}
+            onClose={() => setSupportModalOpen(false)}
+          />
+        )}
 
-      <ReportProblemModal
-        isOpen={reportProblemModalOpen}
-        onClose={() => setReportProblemModalOpen(false)}
-      />
+        {reportProblemModalOpen && (
+          <ReportProblemModal
+            isOpen={reportProblemModalOpen}
+            onClose={() => setReportProblemModalOpen(false)}
+          />
+        )}
 
-      <DocumentationModal
-        isOpen={docsModalOpen}
-        onClose={() => setDocsModalOpen(false)}
-        onOpenRefundPolicy={handleOpenRefundPolicy}
-        onOpenDevTeam={handleOpenDevTeam}
-        onOpenSecurity={handleOpenSecurity}
-        onOpenPrivacyPolicy={handleOpenPrivacyPolicy}
-      />
+        {docsModalOpen && (
+          <DocumentationModal
+            isOpen={docsModalOpen}
+            onClose={() => setDocsModalOpen(false)}
+            onOpenRefundPolicy={handleOpenRefundPolicy}
+            onOpenDevTeam={handleOpenDevTeam}
+            onOpenSecurity={handleOpenSecurity}
+            onOpenPrivacyPolicy={handleOpenPrivacyPolicy}
+          />
+        )}
+      </Suspense>
+
+      {/* 10. Persistent Customer Support Floating Launcher */}
+      <SupportChatLauncher />
     </div>
   );
 }

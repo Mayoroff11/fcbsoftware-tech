@@ -255,11 +255,20 @@ export const Footer: React.FC<FooterProps> = ({
             </h4>
             <ul className="space-y-2.5">
               <li>
-                <button
-                  onClick={onOpenSupport}
-                  className="hover:text-violet-700 text-slate-600 transition-colors cursor-pointer text-left"
+                <a
+                  href="mailto:support@fcbsoftware.tech"
+                  className="hover:text-violet-700 text-slate-600 transition-colors cursor-pointer text-left block"
                 >
                   Contact Support
+                </a>
+              </li>
+              <li>
+                <button
+                  id="footer-link-report-problem"
+                  onClick={onOpenReportProblem}
+                  className="hover:text-violet-700 text-slate-600 transition-colors cursor-pointer text-left font-medium"
+                >
+                  Report a Problem
                 </button>
               </li>
               <li>

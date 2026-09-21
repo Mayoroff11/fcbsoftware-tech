@@ -22,9 +22,18 @@ export const Navbar: React.FC<NavbarProps> = ({
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [mobileMenuOpen]);
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
@@ -117,13 +126,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               Pricing
             </button>
-            <button
+            <a
+              href="mailto:support@fcbsoftware.tech"
               id="nav-link-support"
-              onClick={onOpenSupport}
               className="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-950 hover:bg-slate-900/[0.04] transition-all cursor-pointer font-medium"
             >
               Support
-            </button>
+            </a>
           </nav>
 
           {/* Desktop Action Buttons */}
@@ -197,15 +206,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 Pricing
               </button>
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenSupport();
-                }}
-                className="w-full text-left py-2.5 px-3 text-sm font-medium text-slate-700 hover:text-violet-700 hover:bg-violet-50/80 rounded-xl transition-colors cursor-pointer"
+              <a
+                href="mailto:support@fcbsoftware.tech"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full text-left py-2.5 px-3 text-sm font-medium text-slate-700 hover:text-violet-700 hover:bg-violet-50/80 rounded-xl transition-colors cursor-pointer block"
               >
                 Support
-              </button>
+              </a>
             </div>
 
             <div className="pt-3 border-t border-violet-100 flex flex-col sm:hidden gap-2.5">

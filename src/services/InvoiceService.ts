@@ -9,7 +9,7 @@ const INVOICE_DURATION_MS = 15 * 60 * 1000; // 15 Minutes quote window
 
 export class InvoiceService {
   /**
-   * Retrieves all persisted invoices from authoritative storage
+   * Retrieves all persisted invoices from local cache
    */
   private static getAllInvoices(): Record<string, Invoice> {
     try {
@@ -24,12 +24,12 @@ export class InvoiceService {
   }
 
   /**
-   * Saves invoice to storage
+   * Saves invoice to local storage cache
    */
-  private static saveInvoice(invoice: Invoice): void {
+  public static cacheInvoice(invoice: Invoice): void {
     try {
       const invoices = this.getAllInvoices();
-      invoices[invoice.id] = invoice;
+      invoices[invoice.id.toUpperCase()] = invoice;
       localStorage.setItem(INVOICES_STORAGE_KEY, JSON.stringify(invoices));
     } catch {
       // Fallback
@@ -55,36 +55,54 @@ export class InvoiceService {
 
   /**
    * Creates a brand new invoice with ATOMIC WALLET ROTATION (A -> B -> C -> A...)
+   * Queries the server endpoint first for authoritative concurrency-safe wallet assignment.
    */
   public static async createInvoice(
     planId: string = '1m-personal',
     initialAsset: AssetSymbol = 'BTC',
-    initialNetwork?: NetworkId
+    initialNetwork?: NetworkId,
+    customerEmail?: string
   ): Promise<Invoice> {
+    // 1. Attempt server-side creation for concurrency safety & atomic rotation
+    try {
+      const res = await fetch('/api/invoices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planId,
+          asset: initialAsset,
+          network: initialNetwork,
+          customerEmail,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.invoice) {
+          this.cacheInvoice(data.invoice);
+          return data.invoice;
+        }
+      }
+    } catch (err) {
+      console.warn('[FCB InvoiceService] Remote creation unavailable, falling back to local rotation:', err);
+    }
+
+    // 2. Client-side fallback if server is unreachable
     const plan = ALL_LICENSE_PLANS.find((p) => p.id === planId) || ALL_LICENSE_PLANS[0];
     const usdAmount = this.parseUsdPrice(plan.price);
 
-    // 1. Assign next wallet atomically in rotation
     const assignedWalletId: WalletId = WalletRotationService.getNextWallet();
-
-    // 2. Validate asset and network
     const assetConfig = ASSETS[initialAsset] || ASSETS.BTC;
     const defaultNetwork = initialNetwork || assetConfig.supportedNetworks[0].networkId;
     const networkConfig = NETWORKS[defaultNetwork];
-
-    // 3. Resolve receiving address
     const receivingAddress = getReceivingAddress(assignedWalletId, defaultNetwork);
 
-    // 4. Fetch market exchange rates
     const rates = await RateService.getLatestRates();
     const rate = rates[initialAsset] || assetConfig.defaultPriceUsd;
-
-    // 5. Calculate crypto amount
     const { amount, formatted } = RateService.calculateCryptoAmount(usdAmount, rate, initialAsset);
 
     const now = Date.now();
     const id = this.generateInvoiceId();
-
     const selectedNetworkSupported = assetConfig.supportedNetworks.find((n) => n.networkId === defaultNetwork);
 
     const invoice: Invoice = {
@@ -106,18 +124,20 @@ export class InvoiceService {
       createdAt: now,
       expiresAt: now + INVOICE_DURATION_MS,
       status: 'awaiting_payment',
+      customerEmail: customerEmail?.trim() || undefined,
       confirmations: 0,
       requiredConfirmations: networkConfig.confirmationBlocks,
       updatedAt: now,
-      licenseHash: `FCB-LKEY-${Math.random().toString(36).substring(2, 8).toUpperCase()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+      licenseHash: `FCB-LKEY-${Math.random().toString(36).substring(2, 8).toUpperCase()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+      adminNotificationSent: false,
     };
 
-    this.saveInvoice(invoice);
+    this.cacheInvoice(invoice);
     return invoice;
   }
 
   /**
-   * Retrieves an existing invoice by ID.
+   * Retrieves an existing invoice by ID from cache or syncs with server.
    * Restores the exact same invoice (same wallet, address, rate, amount, timestamps).
    */
   public static getInvoice(invoiceId: string): Invoice | null {
@@ -133,6 +153,26 @@ export class InvoiceService {
   }
 
   /**
+   * Asynchronously fetches an invoice from the server and caches it.
+   */
+  public static async fetchRemoteInvoice(invoiceId: string): Promise<Invoice | null> {
+    if (!invoiceId) return null;
+    try {
+      const res = await fetch(`/api/invoices?id=${encodeURIComponent(invoiceId.trim().toUpperCase())}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.invoice) {
+          this.cacheInvoice(data.invoice);
+          return data.invoice;
+        }
+      }
+    } catch {
+      // Fallback to local
+    }
+    return this.getInvoice(invoiceId);
+  }
+
+  /**
    * Updates an invoice's asset or network while PRESERVING:
    * - the same invoice ID
    * - the same assigned wallet ID
@@ -143,6 +183,30 @@ export class InvoiceService {
     newAsset: AssetSymbol,
     newNetwork: NetworkId
   ): Promise<Invoice | null> {
+    // 1. Try server update
+    try {
+      const res = await fetch('/api/invoices', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          invoiceId: invoiceId.trim().toUpperCase(),
+          asset: newAsset,
+          network: newNetwork,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.invoice) {
+          this.cacheInvoice(data.invoice);
+          return data.invoice;
+        }
+      }
+    } catch (err) {
+      console.warn('[FCB InvoiceService] Remote update failed, using local update:', err);
+    }
+
+    // 2. Local fallback
     const invoice = this.getInvoice(invoiceId);
     if (!invoice) return null;
 
@@ -150,13 +214,9 @@ export class InvoiceService {
     const selectedNetworkSupported = assetConfig.supportedNetworks.find((n) => n.networkId === newNetwork);
     const networkConfig = NETWORKS[newNetwork];
 
-    // Re-resolve address for the assigned wallet on the new network
     const receivingAddress = getReceivingAddress(invoice.walletId, newNetwork);
-
-    // Fetch current rate for new asset
     const rates = await RateService.getLatestRates();
     const rate = rates[newAsset] || assetConfig.defaultPriceUsd;
-
     const { amount, formatted } = RateService.calculateCryptoAmount(invoice.usdAmount, rate, newAsset);
 
     invoice.asset = newAsset;
@@ -169,7 +229,7 @@ export class InvoiceService {
     invoice.requiredConfirmations = networkConfig.confirmationBlocks;
     invoice.updatedAt = Date.now();
 
-    this.saveInvoice(invoice);
+    this.cacheInvoice(invoice);
     return invoice;
   }
 
@@ -180,7 +240,7 @@ export class InvoiceService {
     if (invoice.status === 'awaiting_payment' && Date.now() > invoice.expiresAt) {
       invoice.status = 'expired';
       invoice.updatedAt = Date.now();
-      this.saveInvoice(invoice);
+      this.cacheInvoice(invoice);
     }
     return invoice;
   }
@@ -200,6 +260,7 @@ export class InvoiceService {
     invoice.updatedAt = Date.now();
 
     if (details) {
+      if (details.customerEmail !== undefined) invoice.customerEmail = details.customerEmail;
       if (details.transactionHash !== undefined) invoice.transactionHash = details.transactionHash;
       if (details.detectedAt !== undefined) invoice.detectedAt = details.detectedAt;
       if (details.confirmedAt !== undefined) invoice.confirmedAt = details.confirmedAt;
@@ -209,9 +270,15 @@ export class InvoiceService {
       if (details.overpaidAmount !== undefined) invoice.overpaidAmount = details.overpaidAmount;
       if (details.overpaidUsdAmount !== undefined) invoice.overpaidUsdAmount = details.overpaidUsdAmount;
       if (details.explorerUrl !== undefined) invoice.explorerUrl = details.explorerUrl;
+      if (details.adminNotificationSent !== undefined) invoice.adminNotificationSent = details.adminNotificationSent;
+      if (details.adminNotificationSentAt !== undefined) invoice.adminNotificationSentAt = details.adminNotificationSentAt;
+      if (details.receiptFileName !== undefined) invoice.receiptFileName = details.receiptFileName;
+      if (details.receiptDataUrl !== undefined) invoice.receiptDataUrl = details.receiptDataUrl;
+      if (details.verificationMethod !== undefined) invoice.verificationMethod = details.verificationMethod;
+      if (details.verificationMessage !== undefined) invoice.verificationMessage = details.verificationMessage;
     }
 
-    this.saveInvoice(invoice);
+    this.cacheInvoice(invoice);
     return invoice;
   }
 }

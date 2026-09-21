@@ -71,7 +71,7 @@ export const VideoDemos: React.FC = () => {
               <div className="relative aspect-video w-full bg-slate-950 overflow-hidden border-b border-violet-100">
                 <video
                   controls
-                  preload="metadata"
+                  preload="none"
                   playsInline
                   className="w-full h-full object-cover"
                 >
@@ -81,7 +81,7 @@ export const VideoDemos: React.FC = () => {
               </div>
 
               {/* Card Content: Title, Description, and One Verify Transaction Button */}
-              <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
+              <div className="p-4 sm:p-6 space-y-4 flex-1 flex flex-col justify-between">
                 <div className="space-y-2">
                   {/* 2. Video Title */}
                   <h3 className="text-base font-bold text-slate-900 group-hover:text-violet-900 transition-colors">

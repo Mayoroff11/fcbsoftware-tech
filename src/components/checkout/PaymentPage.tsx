@@ -13,7 +13,8 @@ import { PaymentTimer } from './PaymentTimer.tsx';
 import { PaymentStatusCard } from './PaymentStatusCard.tsx';
 import { PaymentConfirmationCard } from './PaymentConfirmationCard.tsx';
 import { ExpiredInvoiceCard } from './ExpiredInvoiceCard.tsx';
-import { Loader2, ShieldCheck, Sparkles, Check, Key, X } from 'lucide-react';
+import { PaymentVerificationModal } from './PaymentVerificationModal.tsx';
+import { Loader2, ShieldCheck, Sparkles, Check, Key, X, ArrowRight } from 'lucide-react';
 
 interface PaymentPageProps {
   initialPlanId?: string;
@@ -44,6 +45,7 @@ export const PaymentPage: React.FC<PaymentPageProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isGeneratingNew, setIsGeneratingNew] = useState<boolean>(false);
   const [showCancelModal, setShowCancelModal] = useState<boolean>(false);
+  const [showVerificationModal, setShowVerificationModal] = useState<boolean>(false);
 
   // Initialize or restore invoice
   useEffect(() => {
@@ -306,6 +308,30 @@ export const PaymentPage: React.FC<PaymentPageProps> = ({
               tokenContract={invoice.tokenContract}
             />
 
+            {/* I've Made This Payment Prompt Banner */}
+            {(invoice.status === 'awaiting_payment' || invoice.status === 'underpaid' || invoice.status === 'payment_not_yet_detected') && (
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-violet-50 to-indigo-50 border border-violet-200/90 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="space-y-0.5 text-center sm:text-left">
+                  <div className="text-xs font-bold text-slate-900 flex items-center justify-center sm:justify-start gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-violet-600" />
+                    <span>Already completed your transfer?</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600">
+                    Submit your transaction hash to verify and match the payment to your checkout.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  id="btn-ive-made-payment-primary"
+                  onClick={() => setShowVerificationModal(true)}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 transition-all cursor-pointer shadow-md shadow-violet-500/25 flex items-center justify-center gap-1.5 shrink-0 focus:outline-none focus:ring-2 focus:ring-violet-500/40 active:scale-98"
+                >
+                  <span>I've Made This Payment</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
             {/* 5. Wrong Network Protection Warning */}
             <WrongNetworkWarning
               asset={invoice.asset}
@@ -332,6 +358,7 @@ export const PaymentPage: React.FC<PaymentPageProps> = ({
             <PaymentStatusCard
               invoice={invoice}
               onGenerateNewInvoice={handleGenerateNewInvoice}
+              onOpenVerificationModal={() => setShowVerificationModal(true)}
               isGeneratingNew={isGeneratingNew}
             />
 
@@ -354,6 +381,18 @@ export const PaymentPage: React.FC<PaymentPageProps> = ({
         </div>
 
       </main>
+
+      {/* Payment Verification Modal */}
+      {showVerificationModal && invoice && (
+        <PaymentVerificationModal
+          isOpen={showVerificationModal}
+          onClose={() => setShowVerificationModal(false)}
+          invoice={invoice}
+          onVerificationComplete={(updatedInvoice) => {
+            setInvoice(updatedInvoice);
+          }}
+        />
+      )}
 
       {/* Cancel Payment Professional Confirmation Modal */}
       {showCancelModal && (

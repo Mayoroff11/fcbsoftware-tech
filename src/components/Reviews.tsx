@@ -208,9 +208,9 @@ export const Reviews: React.FC = () => {
                 <div
                   key={`${review.id}-${index}`}
                   tabIndex={0}
-                  className="w-[340px] sm:w-[380px] lg:w-[420px] shrink-0 p-6 rounded-2xl glass-primary flex flex-col justify-between space-y-4 select-none cursor-default group focus:outline-none focus:ring-2 focus:ring-violet-400/60 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+                  className="w-[280px] min-[360px]:w-[320px] sm:w-[380px] lg:w-[420px] max-w-[calc(100vw-32px)] shrink-0 p-4 sm:p-6 rounded-2xl glass-primary flex flex-col justify-between space-y-4 select-none cursor-default group focus:outline-none focus:ring-2 focus:ring-violet-400/60 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
                 >
-                  <div className="space-y-3.5">
+                  <div className="space-y-3">
                     {/* Top: Circular Avatar + Reviewer Name + Star Rating */}
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0">

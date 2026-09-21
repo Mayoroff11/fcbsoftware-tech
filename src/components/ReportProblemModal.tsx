@@ -3,32 +3,47 @@ import { X, AlertCircle, CheckCircle2, Send, Loader2, MessageSquareWarning } fro
 
 export interface ReportProblemData {
   email: string;
-  subject?: string;
+  subject: string;
   message: string;
 }
 
 export interface ReportProblemResponse {
   success: boolean;
-  message: string;
+  message?: string;
+  error?: string;
 }
 
 /**
- * Isolated contact problem submission service.
- * Structured so that backend SMTP / API endpoint credentials
- * can be hooked in without redesigning the UI.
+ * Sends problem report to the serverless API endpoint.
+ * The server handles real Zoho SMTP email delivery securely.
  */
 export async function submitProblemReport(
   data: ReportProblemData
 ): Promise<ReportProblemResponse> {
-  // Simulating async client validation & preparation
-  await new Promise((resolve) => setTimeout(resolve, 600));
+  const response = await fetch('/api/report-problem', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email: data.email.trim(),
+      subject: data.subject.trim(),
+      message: data.message.trim(),
+    }),
+  });
 
-  // Note: Local front-end preparation state.
-  // Backend / SMTP service integration can be attached here in the future.
-  return {
-    success: true,
-    message: 'Your message has been prepared successfully. Email delivery will be connected when the support mail service is configured.'
-  };
+  let result: ReportProblemResponse;
+  try {
+    result = await response.json();
+  } catch {
+    throw new Error("We couldn't send your report right now. Please try again or contact support directly at support@fcbsoftware.tech.");
+  }
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.error || "We couldn't send your report right now. Please try again or contact support directly at support@fcbsoftware.tech.");
+  }
+
+  return result;
 }
 
 interface ReportProblemModalProps {
@@ -41,17 +56,19 @@ export const ReportProblemModal: React.FC<ReportProblemModalProps> = ({ isOpen, 
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
 
-  // Validation errors
-  const [errors, setErrors] = useState<{ email?: string; message?: string }>({});
+  // Validation & status state
+  const [errors, setErrors] = useState<{ email?: string; subject?: string; message?: string; global?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isPreparedSuccess, setIsPreparedSuccess] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Refs for accessibility & focus trapping
   const modalRef = useRef<HTMLDivElement>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
-  const MAX_MESSAGE_LENGTH = 2000;
+  const MAX_MESSAGE_LENGTH = 5000;
+  const MAX_SUBJECT_LENGTH = 200;
 
   // Reset form when modal opens or closes
   useEffect(() => {
@@ -61,9 +78,9 @@ export const ReportProblemModal: React.FC<ReportProblemModalProps> = ({ isOpen, 
       setMessage('');
       setErrors({});
       setIsSubmitting(false);
-      setIsPreparedSuccess(false);
+      setIsSuccess(false);
+      setSuccessMessage('');
 
-      // Focus first input after animation
       const timer = setTimeout(() => {
         firstInputRef.current?.focus();
       }, 50);
@@ -78,7 +95,9 @@ export const ReportProblemModal: React.FC<ReportProblemModalProps> = ({ isOpen, 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
-        onClose();
+        if (!isSubmitting) {
+          onClose();
+        }
         return;
       }
 
@@ -107,7 +126,7 @@ export const ReportProblemModal: React.FC<ReportProblemModalProps> = ({ isOpen, 
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, isSubmitting]);
 
   // Lock background scroll when open
   useEffect(() => {
@@ -124,19 +143,25 @@ export const ReportProblemModal: React.FC<ReportProblemModalProps> = ({ isOpen, 
   if (!isOpen) return null;
 
   const validateEmail = (val: string): boolean => {
-    // RFC 5322 simplified email standard validation
     const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
     return emailRegex.test(val.trim());
   };
 
   const validateForm = (): boolean => {
-    const newErrors: { email?: string; message?: string } = {};
+    const newErrors: { email?: string; subject?: string; message?: string; global?: string } = {};
 
     const trimmedEmail = email.trim();
     if (!trimmedEmail) {
       newErrors.email = 'Please enter your email address.';
     } else if (!validateEmail(trimmedEmail)) {
       newErrors.email = 'Please enter a valid email address.';
+    }
+
+    const trimmedSubject = subject.trim();
+    if (!trimmedSubject) {
+      newErrors.subject = 'Please enter a subject.';
+    } else if (trimmedSubject.length > MAX_SUBJECT_LENGTH) {
+      newErrors.subject = `Subject cannot exceed ${MAX_SUBJECT_LENGTH} characters.`;
     }
 
     const trimmedMessage = message.trim();
@@ -152,7 +177,7 @@ export const ReportProblemModal: React.FC<ReportProblemModalProps> = ({ isOpen, 
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleContactSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (isSubmitting) return;
@@ -162,20 +187,29 @@ export const ReportProblemModal: React.FC<ReportProblemModalProps> = ({ isOpen, 
     }
 
     setIsSubmitting(true);
+    setErrors({});
 
     try {
       const response = await submitProblemReport({
         email: email.trim(),
-        subject: subject.trim() || undefined,
-        message: message.trim()
+        subject: subject.trim(),
+        message: message.trim(),
       });
 
       if (response.success) {
-        setIsPreparedSuccess(true);
+        setIsSuccess(true);
+        setSuccessMessage(
+          response.message ||
+          'Your report has been sent successfully. Our support team will review it and respond to you by email.'
+        );
+      } else {
+        setErrors({
+          global: response.error || "We couldn't send your report right now. Please try again or contact support directly at support@fcbsoftware.tech."
+        });
       }
-    } catch {
+    } catch (err: any) {
       setErrors({
-        message: 'An unexpected issue occurred while preparing your message. Please try again.'
+        global: err?.message || "We couldn't send your report right now. Please try again or contact support directly at support@fcbsoftware.tech."
       });
     } finally {
       setIsSubmitting(false);
@@ -212,18 +246,18 @@ export const ReportProblemModal: React.FC<ReportProblemModalProps> = ({ isOpen, 
           onClick={onClose}
           disabled={isSubmitting}
           aria-label="Close dialog"
-          className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-violet-50/80 border border-transparent hover:border-violet-100 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-500/30"
+          className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-violet-50/80 border border-transparent hover:border-violet-100 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-500/30 disabled:opacity-50"
         >
           <X className="w-5 h-5" />
         </button>
 
-        {!isPreparedSuccess ? (
+        {!isSuccess ? (
           <div className="space-y-6">
             {/* Header & Supporting Text */}
             <div className="space-y-1.5 pr-8">
               <div className="inline-flex items-center gap-1.5 text-xs font-bold text-violet-700 uppercase tracking-wider">
                 <MessageSquareWarning className="w-3.5 h-3.5 text-violet-600" />
-                <span>Support &amp; Issue Triage</span>
+                <span>Customer Support</span>
               </div>
               <h2
                 id="report-problem-title"
@@ -235,12 +269,20 @@ export const ReportProblemModal: React.FC<ReportProblemModalProps> = ({ isOpen, 
                 id="report-problem-desc"
                 className="text-xs sm:text-sm text-slate-600 leading-relaxed"
               >
-                Tell us what went wrong and we'll review your message.
+                Describe the issue you are experiencing and our technical support team will assist you.
               </p>
             </div>
 
+            {/* Global Error Banner */}
+            {errors.global && (
+              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-start gap-2.5 animate-in fade-in duration-150">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
+                <span className="leading-relaxed">{errors.global}</span>
+              </div>
+            )}
+
             {/* Form */}
-            <form onSubmit={handleContactSubmit} noValidate className="space-y-4">
+            <form onSubmit={handleSubmit} noValidate className="space-y-4">
               
               {/* Email Address (Required) */}
               <div className="space-y-1.5">
@@ -288,35 +330,58 @@ export const ReportProblemModal: React.FC<ReportProblemModalProps> = ({ isOpen, 
                 )}
               </div>
 
-              {/* Subject (Optional) */}
+              {/* Subject (Required) */}
               <div className="space-y-1.5">
                 <label
                   htmlFor="report-subject-input"
                   className="text-xs font-bold text-slate-700 flex items-center justify-between"
                 >
-                  <span>Subject</span>
-                  <span className="text-[11px] font-normal text-slate-400">Optional</span>
+                  <span>
+                    Subject <span className="text-violet-600">*</span>
+                  </span>
+                  <span className="text-[11px] font-normal text-slate-400">Required</span>
                 </label>
                 <input
                   id="report-subject-input"
                   type="text"
-                  maxLength={120}
+                  required
+                  maxLength={MAX_SUBJECT_LENGTH}
                   disabled={isSubmitting}
                   value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  placeholder="What can we help you with?"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-violet-200/90 hover:border-violet-300 text-xs sm:text-sm text-slate-900 placeholder-slate-400 transition-all focus:outline-none focus:border-violet-600 focus:ring-2 focus:ring-violet-500/20 shadow-2xs"
+                  onChange={(e) => {
+                    setSubject(e.target.value);
+                    if (errors.subject) {
+                      setErrors((prev) => ({ ...prev, subject: undefined }));
+                    }
+                  }}
+                  placeholder="What is the issue regarding?"
+                  className={`w-full px-3.5 py-2.5 rounded-xl bg-white border text-xs sm:text-sm text-slate-900 placeholder-slate-400 transition-all focus:outline-none shadow-2xs ${
+                    errors.subject
+                      ? 'border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 bg-rose-50/30'
+                      : 'border-violet-200/90 hover:border-violet-300 focus:border-violet-600 focus:ring-2 focus:ring-violet-500/20'
+                  }`}
+                  aria-invalid={!!errors.subject}
+                  aria-describedby={errors.subject ? 'subject-error-msg' : undefined}
                 />
+                {errors.subject && (
+                  <div
+                    id="subject-error-msg"
+                    className="flex items-center gap-1.5 text-xs text-rose-600 pt-0.5 animate-in fade-in duration-150"
+                  >
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{errors.subject}</span>
+                  </div>
+                )}
               </div>
 
-              {/* Message (Required) */}
+              {/* Problem / Message (Required) */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label
                     htmlFor="report-message-input"
                     className="text-xs font-bold text-slate-700"
                   >
-                    Message <span className="text-violet-600">*</span>
+                    Problem / Message <span className="text-violet-600">*</span>
                   </label>
                   <span className="text-[11px] font-mono text-slate-400">
                     {message.length}/{MAX_MESSAGE_LENGTH}
@@ -335,7 +400,7 @@ export const ReportProblemModal: React.FC<ReportProblemModalProps> = ({ isOpen, 
                       setErrors((prev) => ({ ...prev, message: undefined }));
                     }
                   }}
-                  placeholder="Describe your problem or message..."
+                  placeholder="Describe your problem or message in detail..."
                   className={`w-full px-3.5 py-2.5 rounded-xl bg-white border text-xs sm:text-sm text-slate-900 placeholder-slate-400 resize-none transition-all focus:outline-none shadow-2xs min-h-[100px] sm:min-h-[120px] ${
                     errors.message
                       ? 'border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 bg-rose-50/30'
@@ -355,13 +420,13 @@ export const ReportProblemModal: React.FC<ReportProblemModalProps> = ({ isOpen, 
                 )}
               </div>
 
-              {/* Submission CTA */}
+              {/* Submission Buttons */}
               <div className="pt-3 flex flex-col-reverse sm:flex-row items-center justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={onClose}
                   disabled={isSubmitting}
-                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer text-center"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer text-center disabled:opacity-50"
                 >
                   Cancel
                 </button>
@@ -371,18 +436,18 @@ export const ReportProblemModal: React.FC<ReportProblemModalProps> = ({ isOpen, 
                   disabled={isSubmitting}
                   className={`w-full sm:w-auto px-6 py-2.5 rounded-xl text-xs font-bold text-white transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-violet-500/25 focus:outline-none focus:ring-2 focus:ring-violet-500/40 active:scale-98 ${
                     isSubmitting
-                      ? 'bg-violet-400 cursor-not-allowed'
+                      ? 'bg-violet-400 cursor-not-allowed opacity-90'
                       : 'bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 hover:shadow-lg hover:shadow-violet-500/30'
                   }`}
                 >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin text-white" />
-                      <span>Validating...</span>
+                      <span>Sending Report...</span>
                     </>
                   ) : (
                     <>
-                      <span>Send Message</span>
+                      <span>Send Report</span>
                       <Send className="w-3.5 h-3.5" />
                     </>
                   )}
@@ -392,12 +457,8 @@ export const ReportProblemModal: React.FC<ReportProblemModalProps> = ({ isOpen, 
           </div>
         ) : (
           /* =========================================================
-             CLEAN CONFIRMATION / TEMPORARY PREPARED STATE
-             Replaces form contents with:
-             ✓
-             Message Ready
-             "Thank you. Your message has been prepared successfully."
-             [ Close ]
+             CONFIRMATION / SUCCESS STATE
+             Only rendered once server confirms email accepted by Zoho
              ========================================================= */
           <div className="text-center py-6 sm:py-8 space-y-5 animate-in fade-in zoom-in-95 duration-200">
             <div className="w-14 h-14 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center mx-auto text-emerald-600 shadow-sm">
@@ -406,16 +467,13 @@ export const ReportProblemModal: React.FC<ReportProblemModalProps> = ({ isOpen, 
 
             <div className="space-y-2 max-w-sm mx-auto">
               <div className="text-xs font-bold uppercase tracking-wider text-emerald-700">
-                Message Ready
+                Report Submitted
               </div>
               <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight font-display">
-                Thank You
+                Report Sent
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Thank you. Your message has been prepared successfully.
-              </p>
-              <p className="text-[11px] text-slate-500 pt-1 leading-relaxed bg-slate-50 p-2.5 rounded-xl border border-slate-200/80">
-                Email delivery will be connected when the support mail service is configured.
+                {successMessage || 'Your report has been sent successfully. Our support team will review it and respond to you by email.'}
               </p>
             </div>
 

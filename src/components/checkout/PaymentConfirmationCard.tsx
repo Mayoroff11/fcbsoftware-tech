@@ -60,6 +60,13 @@ export const PaymentConfirmationCard: React.FC<PaymentConfirmationCardProps> = (
           <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
             Your payment for the <strong className="text-slate-900">{invoice.planName}</strong> has been independently verified on the {netConfig.name} blockchain.
           </p>
+          {invoice.customerEmail && (
+            <div className="pt-1">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-violet-50 border border-violet-200 text-xs font-semibold text-violet-800">
+                License details linked to: {invoice.customerEmail}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* License Credentials Box */}

@@ -12,18 +12,22 @@ import {
   RefreshCw,
   Loader2,
   AlertTriangle,
-  HelpCircle
+  HelpCircle,
+  ShieldCheck,
+  ArrowRight,
 } from 'lucide-react';
 
 interface PaymentStatusCardProps {
   invoice: Invoice;
   onGenerateNewInvoice: () => void;
+  onOpenVerificationModal?: () => void;
   isGeneratingNew?: boolean;
 }
 
 export const PaymentStatusCard: React.FC<PaymentStatusCardProps> = ({
   invoice,
   onGenerateNewInvoice,
+  onOpenVerificationModal,
   isGeneratingNew = false
 }) => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -349,8 +353,21 @@ export const PaymentStatusCard: React.FC<PaymentStatusCardProps> = ({
         </div>
       </div>
 
-      {/* Explicit Generate New Invoice CTA */}
-      <div className="pt-2">
+      {/* Action Buttons */}
+      <div className="pt-2 space-y-2">
+        {onOpenVerificationModal && (invoice.status === 'awaiting_payment' || invoice.status === 'underpaid' || invoice.status === 'payment_not_yet_detected') && (
+          <button
+            type="button"
+            id="btn-ive-made-payment-status-card"
+            onClick={onOpenVerificationModal}
+            className="w-full py-3 px-4 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 transition-all cursor-pointer shadow-md shadow-violet-500/20 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-violet-500/40 active:scale-98"
+          >
+            <ShieldCheck className="w-4 h-4 text-violet-200" />
+            <span>I've Made This Payment</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        )}
+
         <button
           type="button"
           onClick={handleGenerateClick}
