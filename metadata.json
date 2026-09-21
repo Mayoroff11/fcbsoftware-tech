@@ -1,0 +1,6 @@
+{
+  "name": "FCB — Professional Bitcoin Transaction Software",
+  "description": "FCB is professional Bitcoin transaction software engineered for high-precision workflows, multi-output execution, and verifiable operations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
