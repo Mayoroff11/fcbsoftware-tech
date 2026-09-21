@@ -35,7 +35,6 @@ interface PrivacyPolicyProps {
   onOpenRefundPolicy?: () => void;
   onOpenSecurity?: () => void;
   onOpenDevTeam?: () => void;
-  onOpenDocs?: () => void;
 }
 
 export const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({
@@ -43,8 +42,7 @@ export const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({
   onNavigateHome,
   onOpenRefundPolicy,
   onOpenSecurity,
-  onOpenDevTeam,
-  onOpenDocs
+  onOpenDevTeam
 }) => {
   const [activeNav, setActiveNav] = useState<string>('intro');
 

@@ -34,7 +34,6 @@ interface SecurityProps {
   onOpenSupport: () => void;
   onNavigateHome: () => void;
   onOpenRefundPolicy?: () => void;
-  onOpenDocs?: () => void;
   onOpenDevTeam?: () => void;
   onOpenPrivacyPolicy?: () => void;
 }
@@ -43,7 +42,6 @@ export const Security: React.FC<SecurityProps> = ({
   onOpenSupport,
   onNavigateHome,
   onOpenRefundPolicy,
-  onOpenDocs,
   onOpenDevTeam,
   onOpenPrivacyPolicy
 }) => {
@@ -852,14 +850,6 @@ export const Security: React.FC<SecurityProps> = ({
                       className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-all cursor-pointer"
                     >
                       <span>Development Team</span>
-                    </button>
-                  )}
-                  {onOpenDocs && (
-                    <button
-                      onClick={onOpenDocs}
-                      className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-all cursor-pointer"
-                    >
-                      <span>Documentation</span>
                     </button>
                   )}
                 </div>

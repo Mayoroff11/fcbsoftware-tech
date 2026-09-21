@@ -7,10 +7,7 @@ import {
   Copy,
   Check,
   ExternalLink,
-  ShieldCheck,
   Key,
-  Download,
-  ArrowRight,
   Terminal,
   FileCheck
 } from 'lucide-react';
@@ -18,13 +15,11 @@ import {
 interface PaymentConfirmationCardProps {
   invoice: Invoice;
   onNavigateHome: () => void;
-  onOpenDocs?: () => void;
 }
 
 export const PaymentConfirmationCard: React.FC<PaymentConfirmationCardProps> = ({
   invoice,
-  onNavigateHome,
-  onOpenDocs
+  onNavigateHome
 }) => {
   const [copiedKey, setCopiedKey] = useState(false);
   const netConfig = NETWORKS[invoice.network] || NETWORKS.bitcoin;
@@ -201,17 +196,6 @@ export const PaymentConfirmationCard: React.FC<PaymentConfirmationCardProps> = (
           >
             Return to Overview
           </button>
-
-          {onOpenDocs && (
-            <button
-              type="button"
-              onClick={onOpenDocs}
-              className="px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-violet-600 hover:bg-violet-700 transition-colors cursor-pointer shadow-sm flex items-center gap-1.5"
-            >
-              <span>View Technical Documentation</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          )}
         </div>
       </div>
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ShieldCheck, Lock, RefreshCw, Menu, X, Home, Shield, FileText, Users, RotateCcw, BookOpen, LifeBuoy } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, Lock, RefreshCw, Menu, X, Home, Shield, FileText, Users, RotateCcw, LifeBuoy } from 'lucide-react';
 import { BrandLogoMark } from '../BrandLogo.tsx';
 
 interface CheckoutHeaderProps {
@@ -11,7 +11,6 @@ interface CheckoutHeaderProps {
   onOpenPrivacyPolicy?: () => void;
   onOpenDevTeam?: () => void;
   onOpenRefundPolicy?: () => void;
-  onOpenDocs?: () => void;
   onOpenSupport?: () => void;
   isGeneratingNew?: boolean;
 }
@@ -25,7 +24,6 @@ export const CheckoutHeader: React.FC<CheckoutHeaderProps> = ({
   onOpenPrivacyPolicy,
   onOpenDevTeam,
   onOpenRefundPolicy,
-  onOpenDocs,
   onOpenSupport,
   isGeneratingNew = false
 }) => {
@@ -237,19 +235,6 @@ export const CheckoutHeader: React.FC<CheckoutHeaderProps> = ({
               >
                 <RotateCcw className="w-4 h-4 text-violet-600" />
                 <span>Refund Policy</span>
-              </button>
-            )}
-            {onOpenDocs && (
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenDocs();
-                }}
-                className="w-full text-left px-3 py-2 rounded-lg text-slate-700 hover:bg-violet-50 hover:text-violet-700 flex items-center gap-2 cursor-pointer font-medium"
-              >
-                <BookOpen className="w-4 h-4 text-violet-600" />
-                <span>Documentation</span>
               </button>
             )}
             {onOpenSupport && (

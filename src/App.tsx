@@ -20,7 +20,6 @@ const PrivacyPolicy = lazy(() => import('./components/PrivacyPolicy.tsx').then(m
 const LicenseModal = lazy(() => import('./components/LicenseModal.tsx').then(m => ({ default: m.LicenseModal })));
 const SupportModal = lazy(() => import('./components/SupportModal.tsx').then(m => ({ default: m.SupportModal })));
 const ReportProblemModal = lazy(() => import('./components/ReportProblemModal.tsx').then(m => ({ default: m.ReportProblemModal })));
-const DocumentationModal = lazy(() => import('./components/DocumentationModal.tsx').then(m => ({ default: m.DocumentationModal })));
 const NotFound = lazy(() => import('./components/NotFound.tsx').then(m => ({ default: m.NotFound })));
 
 // Lightweight Fallback Loading State
@@ -42,7 +41,6 @@ export default function App() {
   const [selectedTierId, setSelectedTierId] = useState<string>('1m-personal');
   const [supportModalOpen, setSupportModalOpen] = useState(false);
   const [reportProblemModalOpen, setReportProblemModalOpen] = useState(false);
-  const [docsModalOpen, setDocsModalOpen] = useState(false);
 
   useEffect(() => {
     const handleHash = () => {
@@ -167,7 +165,6 @@ export default function App() {
         <Navbar
           onOpenLicense={handleOpenLicense}
           onOpenSupport={() => setSupportModalOpen(true)}
-          onOpenDocs={() => setDocsModalOpen(true)}
           onNavigateHome={currentView !== 'home' ? handleNavigateHome : undefined}
         />
       )}
@@ -184,7 +181,6 @@ export default function App() {
               onOpenPrivacyPolicy={handleOpenPrivacyPolicy}
               onOpenDevTeam={handleOpenDevTeam}
               onOpenRefundPolicy={handleOpenRefundPolicy}
-              onOpenDocs={() => setDocsModalOpen(true)}
               onOpenSupport={() => setSupportModalOpen(true)}
             />
           ) : currentView === 'refund-policy' ? (
@@ -197,7 +193,6 @@ export default function App() {
             <DevelopmentTeam
               onOpenSupport={() => setSupportModalOpen(true)}
               onNavigateHome={() => handleNavigateHome('hero')}
-              onOpenDocs={() => setDocsModalOpen(true)}
               onOpenSecurity={handleOpenSecurity}
             />
           ) : currentView === 'security' ? (
@@ -205,7 +200,6 @@ export default function App() {
               onOpenSupport={() => setSupportModalOpen(true)}
               onNavigateHome={() => handleNavigateHome('hero')}
               onOpenRefundPolicy={handleOpenRefundPolicy}
-              onOpenDocs={() => setDocsModalOpen(true)}
               onOpenDevTeam={handleOpenDevTeam}
               onOpenPrivacyPolicy={handleOpenPrivacyPolicy}
             />
@@ -216,7 +210,6 @@ export default function App() {
               onOpenRefundPolicy={handleOpenRefundPolicy}
               onOpenSecurity={handleOpenSecurity}
               onOpenDevTeam={handleOpenDevTeam}
-              onOpenDocs={() => setDocsModalOpen(true)}
             />
           ) : currentView === 'not-found' ? (
             <NotFound onNavigateHome={() => handleNavigateHome('hero')} />
@@ -257,7 +250,6 @@ export default function App() {
         onOpenLicense={handleOpenLicense}
         onOpenSupport={() => setSupportModalOpen(true)}
         onOpenReportProblem={() => setReportProblemModalOpen(true)}
-        onOpenDocs={() => setDocsModalOpen(true)}
         onOpenRefundPolicy={handleOpenRefundPolicy}
         onOpenDevTeam={handleOpenDevTeam}
         onOpenSecurity={handleOpenSecurity}
@@ -287,17 +279,6 @@ export default function App() {
           <ReportProblemModal
             isOpen={reportProblemModalOpen}
             onClose={() => setReportProblemModalOpen(false)}
-          />
-        )}
-
-        {docsModalOpen && (
-          <DocumentationModal
-            isOpen={docsModalOpen}
-            onClose={() => setDocsModalOpen(false)}
-            onOpenRefundPolicy={handleOpenRefundPolicy}
-            onOpenDevTeam={handleOpenDevTeam}
-            onOpenSecurity={handleOpenSecurity}
-            onOpenPrivacyPolicy={handleOpenPrivacyPolicy}
           />
         )}
       </Suspense>

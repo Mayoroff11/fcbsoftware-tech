@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, BookOpen, Key } from 'lucide-react';
+import { Menu, X, Key } from 'lucide-react';
 import { BrandLogo } from './BrandLogo.tsx';
 
 interface NavbarProps {
   onOpenLicense: (tierId?: string) => void;
   onOpenSupport: () => void;
-  onOpenDocs: () => void;
   onNavigateHome?: (sectionId?: string) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ 
   onOpenLicense, 
   onOpenSupport, 
-  onOpenDocs,
   onNavigateHome 
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -135,17 +133,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             </a>
           </nav>
 
-          {/* Desktop Action Buttons */}
-          <div className="hidden sm:flex items-center gap-2.5">
-            <button
-              id="nav-btn-docs"
-              onClick={onOpenDocs}
-              className="px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs font-medium text-slate-700 hover:text-slate-950 bg-white/80 hover:bg-white border border-slate-200/90 hover:border-violet-300 rounded-xl transition-all duration-200 flex items-center gap-1.5 cursor-pointer backdrop-blur-xl shadow-2xs hover:shadow-xs hover:-translate-y-0.5"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-violet-600" />
-              <span>FCB Documentation</span>
-            </button>
-
+          {/* Desktop Action Button */}
+          <div className="hidden sm:flex items-center">
             <button
               id="nav-btn-acquire-license"
               onClick={() => scrollToSection('pricing')}
@@ -215,18 +204,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </a>
             </div>
 
-            <div className="pt-3 border-t border-violet-100 flex flex-col sm:hidden gap-2.5">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenDocs();
-                }}
-                className="w-full py-2.5 px-4 text-xs font-medium text-slate-700 bg-white hover:bg-violet-50 border border-violet-200/80 rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
-              >
-                <BookOpen className="w-4 h-4 text-violet-600" />
-                <span>FCB Documentation</span>
-              </button>
-
+            <div className="pt-3 border-t border-violet-100 flex flex-col sm:hidden">
               <button
                 onClick={() => scrollToSection('pricing')}
                 className="w-full py-2.5 px-4 text-xs font-semibold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-md shadow-violet-500/25 cursor-pointer border border-white/20"

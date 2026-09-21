@@ -10,7 +10,6 @@ interface FooterProps {
   onOpenLicense: (tierId?: string) => void;
   onOpenSupport: () => void;
   onOpenReportProblem?: () => void;
-  onOpenDocs: () => void;
   onOpenRefundPolicy?: () => void;
   onOpenDevTeam?: () => void;
   onOpenSecurity?: () => void;
@@ -22,7 +21,6 @@ export const Footer: React.FC<FooterProps> = ({
   onOpenLicense, 
   onOpenSupport, 
   onOpenReportProblem,
-  onOpenDocs,
   onOpenRefundPolicy,
   onOpenDevTeam,
   onOpenSecurity,
@@ -223,7 +221,7 @@ export const Footer: React.FC<FooterProps> = ({
             <ul className="space-y-2.5">
               <li>
                 <button
-                  onClick={onOpenDevTeam || onOpenDocs}
+                  onClick={onOpenDevTeam}
                   className="hover:text-violet-700 text-slate-600 transition-colors cursor-pointer text-left font-medium"
                 >
                   Development Team
@@ -231,7 +229,7 @@ export const Footer: React.FC<FooterProps> = ({
               </li>
               <li>
                 <button
-                  onClick={onOpenSecurity || onOpenDocs}
+                  onClick={onOpenSecurity}
                   className="hover:text-violet-700 text-slate-600 transition-colors cursor-pointer text-left font-medium"
                 >
                   Security
@@ -239,7 +237,7 @@ export const Footer: React.FC<FooterProps> = ({
               </li>
               <li>
                 <button
-                  onClick={onOpenPrivacyPolicy || onOpenDocs}
+                  onClick={onOpenPrivacyPolicy}
                   className="hover:text-violet-700 text-slate-600 transition-colors cursor-pointer text-left font-medium"
                 >
                   Privacy Policy
@@ -273,7 +271,7 @@ export const Footer: React.FC<FooterProps> = ({
               </li>
               <li>
                 <button
-                  onClick={onOpenRefundPolicy || onOpenDocs}
+                  onClick={onOpenRefundPolicy}
                   className="hover:text-violet-700 text-slate-600 transition-colors cursor-pointer text-left font-medium"
                 >
                   Return / Refund Policy
@@ -294,14 +292,14 @@ export const Footer: React.FC<FooterProps> = ({
 
           <div className="flex items-center gap-6">
             <button
-              onClick={onOpenPrivacyPolicy || onOpenDocs}
+              onClick={onOpenPrivacyPolicy}
               className="hover:text-violet-700 transition-colors cursor-pointer"
             >
               Privacy Policy
             </button>
             <span className="text-violet-300">•</span>
             <button
-              onClick={onOpenRefundPolicy || onOpenDocs}
+              onClick={onOpenRefundPolicy}
               className="hover:text-violet-700 transition-colors cursor-pointer"
             >
               Terms / Conditions

@@ -25,7 +25,6 @@ interface PaymentPageProps {
   onOpenPrivacyPolicy?: () => void;
   onOpenDevTeam?: () => void;
   onOpenRefundPolicy?: () => void;
-  onOpenDocs?: () => void;
   onOpenSupport?: () => void;
 }
 
@@ -38,7 +37,6 @@ export const PaymentPage: React.FC<PaymentPageProps> = ({
   onOpenPrivacyPolicy,
   onOpenDevTeam,
   onOpenRefundPolicy,
-  onOpenDocs,
   onOpenSupport
 }) => {
   const [invoice, setInvoice] = useState<Invoice | null>(null);
@@ -175,7 +173,6 @@ export const PaymentPage: React.FC<PaymentPageProps> = ({
           onOpenPrivacyPolicy={onOpenPrivacyPolicy}
           onOpenDevTeam={onOpenDevTeam}
           onOpenRefundPolicy={onOpenRefundPolicy}
-          onOpenDocs={onOpenDocs}
           onOpenSupport={onOpenSupport}
           isGeneratingNew={isGeneratingNew}
         />
@@ -183,7 +180,6 @@ export const PaymentPage: React.FC<PaymentPageProps> = ({
           <PaymentConfirmationCard
             invoice={invoice}
             onNavigateHome={onNavigateHome}
-            onOpenDocs={onOpenDocs}
           />
         </main>
       </div>
@@ -203,7 +199,6 @@ export const PaymentPage: React.FC<PaymentPageProps> = ({
           onOpenPrivacyPolicy={onOpenPrivacyPolicy}
           onOpenDevTeam={onOpenDevTeam}
           onOpenRefundPolicy={onOpenRefundPolicy}
-          onOpenDocs={onOpenDocs}
           onOpenSupport={onOpenSupport}
           isGeneratingNew={isGeneratingNew}
         />
@@ -232,7 +227,6 @@ export const PaymentPage: React.FC<PaymentPageProps> = ({
         onOpenPrivacyPolicy={onOpenPrivacyPolicy}
         onOpenDevTeam={onOpenDevTeam}
         onOpenRefundPolicy={onOpenRefundPolicy}
-        onOpenDocs={onOpenDocs}
         onOpenSupport={onOpenSupport}
         isGeneratingNew={isGeneratingNew}
       />
