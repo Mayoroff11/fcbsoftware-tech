@@ -246,7 +246,7 @@ export const ReportProblemModal: React.FC<ReportProblemModalProps> = ({ isOpen, 
           onClick={onClose}
           disabled={isSubmitting}
           aria-label="Close dialog"
-          className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-violet-50/80 border border-transparent hover:border-violet-100 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-500/30 disabled:opacity-50"
+          className="absolute top-5 right-5 min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-violet-50/80 border border-transparent hover:border-violet-100 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-500/30 disabled:opacity-50"
         >
           <X className="w-5 h-5" />
         </button>
@@ -426,7 +426,7 @@ export const ReportProblemModal: React.FC<ReportProblemModalProps> = ({ isOpen, 
                   type="button"
                   onClick={onClose}
                   disabled={isSubmitting}
-                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer text-center disabled:opacity-50"
+                  className="w-full sm:w-auto min-h-[44px] px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer text-center disabled:opacity-50 flex items-center justify-center"
                 >
                   Cancel
                 </button>
@@ -434,7 +434,7 @@ export const ReportProblemModal: React.FC<ReportProblemModalProps> = ({ isOpen, 
                   id="btn-send-report-message"
                   type="submit"
                   disabled={isSubmitting}
-                  className={`w-full sm:w-auto px-6 py-2.5 rounded-xl text-xs font-bold text-white transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-violet-500/25 focus:outline-none focus:ring-2 focus:ring-violet-500/40 active:scale-98 ${
+                  className={`w-full sm:w-auto min-h-[44px] px-6 py-2.5 rounded-xl text-xs font-bold text-white transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-violet-500/25 focus:outline-none focus:ring-2 focus:ring-violet-500/40 active:scale-98 ${
                     isSubmitting
                       ? 'bg-violet-400 cursor-not-allowed opacity-90'
                       : 'bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 hover:shadow-lg hover:shadow-violet-500/30'
@@ -482,7 +482,7 @@ export const ReportProblemModal: React.FC<ReportProblemModalProps> = ({ isOpen, 
                 id="btn-close-report-success"
                 type="button"
                 onClick={onClose}
-                className="w-full sm:w-auto px-8 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 transition-all cursor-pointer shadow-md shadow-violet-500/25"
+                className="w-full sm:w-auto min-h-[44px] px-8 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 transition-all cursor-pointer shadow-md shadow-violet-500/25 flex items-center justify-center mx-auto"
               >
                 Close
               </button>

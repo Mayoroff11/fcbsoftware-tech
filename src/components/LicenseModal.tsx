@@ -54,7 +54,7 @@ export const LicenseModal: React.FC<LicenseModalProps> = ({
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-violet-50 border border-violet-100 transition-all cursor-pointer"
+          className="absolute top-5 right-5 min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-violet-50 border border-violet-100 transition-all cursor-pointer"
           aria-label="Close modal"
         >
           <X className="w-5 h-5" />
@@ -222,7 +222,7 @@ export const LicenseModal: React.FC<LicenseModalProps> = ({
 
                 <button
                   type="submit"
-                  className="w-full sm:w-auto px-6 py-3 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-violet-500/25"
+                  className="w-full sm:w-auto min-h-[44px] px-6 py-3 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-violet-500/25 active:scale-[0.99]"
                 >
                   <span>Submit License Request</span>
                   <ArrowRight className="w-4 h-4" />

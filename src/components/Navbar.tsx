@@ -150,7 +150,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               id="mobile-menu-toggle"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 sm:p-2.5 text-slate-700 hover:text-slate-950 bg-white/90 border border-violet-200/90 rounded-xl focus:outline-none cursor-pointer shadow-2xs backdrop-blur-md transition-all active:scale-95"
+              className="min-w-[44px] min-h-[44px] p-2 sm:p-2.5 text-slate-700 hover:text-slate-950 bg-white/95 border border-violet-200/90 rounded-xl focus:outline-none cursor-pointer shadow-xs flex items-center justify-center transition-all active:scale-95"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -162,43 +162,43 @@ export const Navbar: React.FC<NavbarProps> = ({
         {mobileMenuOpen && (
           <div
             id="mobile-nav-menu"
-            className="lg:hidden border-t border-violet-100/90 px-4 pt-3 pb-5 space-y-3 bg-white/95 backdrop-blur-2xl rounded-b-2xl shadow-xl shadow-violet-950/5"
+            className="lg:hidden border-t border-violet-100/90 px-4 pt-3 pb-5 space-y-3 bg-white/98 rounded-b-2xl shadow-xl shadow-violet-950/5"
           >
-            <div className="flex flex-col space-y-0.5">
+            <div className="flex flex-col space-y-1">
               <button
                 onClick={() => scrollToSection('about')}
-                className="w-full text-left py-2.5 px-3 text-sm font-medium text-slate-700 hover:text-violet-700 hover:bg-violet-50/80 rounded-xl transition-colors cursor-pointer"
+                className="w-full min-h-[44px] text-left py-2.5 px-3.5 text-sm font-medium text-slate-700 hover:text-violet-700 hover:bg-violet-50/80 rounded-xl transition-colors cursor-pointer flex items-center"
               >
                 About
               </button>
               <button
                 onClick={() => scrollToSection('licenses')}
-                className="w-full text-left py-2.5 px-3 text-sm font-medium text-slate-700 hover:text-violet-700 hover:bg-violet-50/80 rounded-xl transition-colors cursor-pointer"
+                className="w-full min-h-[44px] text-left py-2.5 px-3.5 text-sm font-medium text-slate-700 hover:text-violet-700 hover:bg-violet-50/80 rounded-xl transition-colors cursor-pointer flex items-center"
               >
                 Licenses
               </button>
               <button
                 onClick={() => scrollToSection('demonstrations')}
-                className="w-full text-left py-2.5 px-3 text-sm font-medium text-slate-700 hover:text-violet-700 hover:bg-violet-50/80 rounded-xl transition-colors cursor-pointer"
+                className="w-full min-h-[44px] text-left py-2.5 px-3.5 text-sm font-medium text-slate-700 hover:text-violet-700 hover:bg-violet-50/80 rounded-xl transition-colors cursor-pointer flex items-center"
               >
                 Demonstrations
               </button>
               <button
                 onClick={() => scrollToSection('reviews')}
-                className="w-full text-left py-2.5 px-3 text-sm font-medium text-slate-700 hover:text-violet-700 hover:bg-violet-50/80 rounded-xl transition-colors cursor-pointer"
+                className="w-full min-h-[44px] text-left py-2.5 px-3.5 text-sm font-medium text-slate-700 hover:text-violet-700 hover:bg-violet-50/80 rounded-xl transition-colors cursor-pointer flex items-center"
               >
                 Reviews
               </button>
               <button
                 onClick={() => scrollToSection('pricing')}
-                className="w-full text-left py-2.5 px-3 text-sm font-medium text-slate-700 hover:text-violet-700 hover:bg-violet-50/80 rounded-xl transition-colors cursor-pointer"
+                className="w-full min-h-[44px] text-left py-2.5 px-3.5 text-sm font-medium text-slate-700 hover:text-violet-700 hover:bg-violet-50/80 rounded-xl transition-colors cursor-pointer flex items-center"
               >
                 Pricing
               </button>
               <a
                 href="mailto:support@fcbsoftware.tech"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-left py-2.5 px-3 text-sm font-medium text-slate-700 hover:text-violet-700 hover:bg-violet-50/80 rounded-xl transition-colors cursor-pointer block"
+                className="w-full min-h-[44px] text-left py-2.5 px-3.5 text-sm font-medium text-slate-700 hover:text-violet-700 hover:bg-violet-50/80 rounded-xl transition-colors cursor-pointer flex items-center"
               >
                 Support
               </a>
@@ -207,7 +207,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="pt-3 border-t border-violet-100 flex flex-col sm:hidden">
               <button
                 onClick={() => scrollToSection('pricing')}
-                className="w-full py-2.5 px-4 text-xs font-semibold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-md shadow-violet-500/25 cursor-pointer border border-white/20"
+                className="w-full min-h-[44px] py-2.5 px-4 text-xs font-semibold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-md shadow-violet-500/25 cursor-pointer border border-white/20 active:scale-[0.99]"
               >
                 <Key className="w-4 h-4" />
                 <span>Acquire License</span>

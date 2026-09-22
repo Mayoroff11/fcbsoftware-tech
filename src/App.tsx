@@ -5,9 +5,11 @@ import { AboutSoftware } from './components/AboutSoftware.tsx';
 import { VideoDemos } from './components/VideoDemos.tsx';
 import { Pricing } from './components/Pricing.tsx';
 import { Reviews } from './components/Reviews.tsx';
+import { StatsCounter } from './components/StatsCounter.tsx';
 import { FinalCta } from './components/FinalCta.tsx';
 import { Footer } from './components/Footer.tsx';
 import { BlockchainOverlay } from './components/BlockchainOverlay.tsx';
+import { ScrollProgressBar } from './components/ScrollProgressBar.tsx';
 import { SupportChatLauncher } from './components/SupportChatLauncher.tsx';
 import { Loader2 } from 'lucide-react';
 
@@ -18,7 +20,6 @@ const DevelopmentTeam = lazy(() => import('./components/DevelopmentTeam.tsx').th
 const Security = lazy(() => import('./components/Security.tsx').then(m => ({ default: m.Security })));
 const PrivacyPolicy = lazy(() => import('./components/PrivacyPolicy.tsx').then(m => ({ default: m.PrivacyPolicy })));
 const LicenseModal = lazy(() => import('./components/LicenseModal.tsx').then(m => ({ default: m.LicenseModal })));
-const SupportModal = lazy(() => import('./components/SupportModal.tsx').then(m => ({ default: m.SupportModal })));
 const ReportProblemModal = lazy(() => import('./components/ReportProblemModal.tsx').then(m => ({ default: m.ReportProblemModal })));
 const NotFound = lazy(() => import('./components/NotFound.tsx').then(m => ({ default: m.NotFound })));
 
@@ -39,8 +40,11 @@ export default function App() {
   const [activeInvoiceId, setActiveInvoiceId] = useState<string | undefined>(undefined);
   const [licenseModalOpen, setLicenseModalOpen] = useState(false);
   const [selectedTierId, setSelectedTierId] = useState<string>('1m-personal');
-  const [supportModalOpen, setSupportModalOpen] = useState(false);
   const [reportProblemModalOpen, setReportProblemModalOpen] = useState(false);
+
+  const handleOpenSupport = () => {
+    window.location.href = 'mailto:support@fcbsoftware.tech';
+  };
 
   useEffect(() => {
     const handleHash = () => {
@@ -157,6 +161,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#f7f5fd] text-[#1e1b33] flex flex-col font-sans selection:bg-violet-500/20 selection:text-violet-900 antialiased relative">
+      {/* Viewport Scroll Progress Bar */}
+      <ScrollProgressBar />
+
       {/* Abstract Blockchain Network Visual Overlay */}
       <BlockchainOverlay />
 
@@ -164,7 +171,7 @@ export default function App() {
       {currentView !== 'checkout' && (
         <Navbar
           onOpenLicense={handleOpenLicense}
-          onOpenSupport={() => setSupportModalOpen(true)}
+          onOpenSupport={handleOpenSupport}
           onNavigateHome={currentView !== 'home' ? handleNavigateHome : undefined}
         />
       )}
@@ -181,23 +188,23 @@ export default function App() {
               onOpenPrivacyPolicy={handleOpenPrivacyPolicy}
               onOpenDevTeam={handleOpenDevTeam}
               onOpenRefundPolicy={handleOpenRefundPolicy}
-              onOpenSupport={() => setSupportModalOpen(true)}
+              onOpenSupport={handleOpenSupport}
             />
           ) : currentView === 'refund-policy' ? (
             <RefundPolicy
-              onOpenSupport={() => setSupportModalOpen(true)}
+              onOpenSupport={handleOpenSupport}
               onNavigateHome={() => handleNavigateHome('hero')}
               onOpenLicense={handleOpenLicense}
             />
           ) : currentView === 'dev-team' ? (
             <DevelopmentTeam
-              onOpenSupport={() => setSupportModalOpen(true)}
+              onOpenSupport={handleOpenSupport}
               onNavigateHome={() => handleNavigateHome('hero')}
               onOpenSecurity={handleOpenSecurity}
             />
           ) : currentView === 'security' ? (
             <Security
-              onOpenSupport={() => setSupportModalOpen(true)}
+              onOpenSupport={handleOpenSupport}
               onNavigateHome={() => handleNavigateHome('hero')}
               onOpenRefundPolicy={handleOpenRefundPolicy}
               onOpenDevTeam={handleOpenDevTeam}
@@ -205,7 +212,7 @@ export default function App() {
             />
           ) : currentView === 'privacy-policy' ? (
             <PrivacyPolicy
-              onOpenSupport={() => setSupportModalOpen(true)}
+              onOpenSupport={handleOpenSupport}
               onNavigateHome={() => handleNavigateHome('hero')}
               onOpenRefundPolicy={handleOpenRefundPolicy}
               onOpenSecurity={handleOpenSecurity}
@@ -229,16 +236,19 @@ export default function App() {
               {/* 6. Pricing Section */}
               <Pricing
                 onOpenLicense={handleOpenLicense}
-                onOpenSupport={() => setSupportModalOpen(true)}
+                onOpenSupport={handleOpenSupport}
               />
 
-              {/* 7. Operator Reviews & Animated Statistics */}
+              {/* 7. Operator Reviews */}
               <Reviews />
 
-              {/* 8. Final CTA ("Ready to Explore FCB?") */}
+              {/* 8. Global Metrics & Platform Statistics Counter */}
+              <StatsCounter />
+
+              {/* 9. Final CTA ("Ready to Explore FCB?") */}
               <FinalCta
                 onOpenLicense={() => handleNavigateHome('pricing')}
-                onOpenSupport={() => setSupportModalOpen(true)}
+                onOpenSupport={handleOpenSupport}
               />
             </>
           )}
@@ -248,7 +258,7 @@ export default function App() {
       {/* 9. Shared Footer */}
       <Footer
         onOpenLicense={handleOpenLicense}
-        onOpenSupport={() => setSupportModalOpen(true)}
+        onOpenSupport={handleOpenSupport}
         onOpenReportProblem={() => setReportProblemModalOpen(true)}
         onOpenRefundPolicy={handleOpenRefundPolicy}
         onOpenDevTeam={handleOpenDevTeam}
@@ -268,13 +278,6 @@ export default function App() {
           />
         )}
 
-        {supportModalOpen && (
-          <SupportModal
-            isOpen={supportModalOpen}
-            onClose={() => setSupportModalOpen(false)}
-          />
-        )}
-
         {reportProblemModalOpen && (
           <ReportProblemModal
             isOpen={reportProblemModalOpen}
@@ -288,3 +291,4 @@ export default function App() {
     </div>
   );
 }
+

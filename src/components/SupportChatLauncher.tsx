@@ -15,12 +15,13 @@ const WHATSAPP_URL = 'https://wa.me/447735300809?text=Hello%2C%20I%20need%20assi
 export const SupportChatLauncher: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isTawkLoaded, setIsTawkLoaded] = useState(false);
+  const [isLoadingLiveChat, setIsLoadingLiveChat] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const launcherButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Initialize official Tawk.to widget once asynchronously
-  useEffect(() => {
-    // Check if script already inserted to prevent duplicate script tags
+  // Helper to load Tawk.to asynchronously without blocking initial load
+  const loadTawkScript = () => {
+    if (typeof window === 'undefined') return;
     if (document.getElementById('tawk-script-loader')) {
       if (window.Tawk_API) {
         setIsTawkLoaded(true);
@@ -31,9 +32,9 @@ export const SupportChatLauncher: React.FC = () => {
     window.Tawk_API = window.Tawk_API || {};
     window.Tawk_LoadStart = new Date();
 
-    // Configure Tawk.to callbacks to hide the default floating bubble so FCB's custom launcher is the single entry point
     window.Tawk_API.onLoad = function () {
       setIsTawkLoaded(true);
+      setIsLoadingLiveChat(false);
       try {
         if (typeof window.Tawk_API?.hideWidget === 'function') {
           window.Tawk_API.hideWidget();
@@ -62,15 +63,29 @@ export const SupportChatLauncher: React.FC = () => {
     script.setAttribute('crossorigin', '*');
 
     script.onerror = () => {
+      setIsLoadingLiveChat(false);
       console.warn('[FCB Support] Tawk.to failed to load or was blocked by client.');
     };
 
-    const firstScript = document.getElementsByTagName('script')[0];
-    if (firstScript && firstScript.parentNode) {
-      firstScript.parentNode.insertBefore(script, firstScript);
-    } else {
-      document.head.appendChild(script);
+    document.head.appendChild(script);
+  };
+
+  // Defer initialization to after page is completely interactive (requestIdleCallback or 3.5s delay)
+  useEffect(() => {
+    let timeoutId: any;
+    if (typeof window !== 'undefined') {
+      if ('requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(() => {
+          timeoutId = setTimeout(loadTawkScript, 2500);
+        }, { timeout: 4000 });
+      } else {
+        timeoutId = setTimeout(loadTawkScript, 3500);
+      }
     }
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, []);
 
   // Close panel on escape key
@@ -110,13 +125,10 @@ export const SupportChatLauncher: React.FC = () => {
 
   // Action: Launch real Tawk.to live chat widget
   const handleStartLiveChat = () => {
-    setIsOpen(false);
-
-    if (window.Tawk_API) {
+    if (window.Tawk_API && typeof window.Tawk_API.showWidget === 'function') {
+      setIsOpen(false);
       try {
-        if (typeof window.Tawk_API.showWidget === 'function') {
-          window.Tawk_API.showWidget();
-        }
+        window.Tawk_API.showWidget();
         if (typeof window.Tawk_API.maximize === 'function') {
           window.Tawk_API.maximize();
         } else if (typeof window.Tawk_API.toggle === 'function') {
@@ -126,21 +138,31 @@ export const SupportChatLauncher: React.FC = () => {
         console.warn('[FCB Support] Error invoking Tawk API:', err);
       }
     } else {
-      // If Tawk is still initializing, retry briefly
-      setTimeout(() => {
-        if (window.Tawk_API) {
+      // If user tapped before Tawk finished loading, load it immediately!
+      setIsLoadingLiveChat(true);
+      loadTawkScript();
+      let checks = 0;
+      const interval = setInterval(() => {
+        checks++;
+        if (window.Tawk_API && typeof window.Tawk_API.showWidget === 'function') {
+          clearInterval(interval);
+          setIsLoadingLiveChat(false);
+          setIsOpen(false);
           try {
-            if (typeof window.Tawk_API.showWidget === 'function') {
-              window.Tawk_API.showWidget();
-            }
+            window.Tawk_API.showWidget();
             if (typeof window.Tawk_API.maximize === 'function') {
               window.Tawk_API.maximize();
             }
           } catch {
-            // Fallback
+            // fallback
           }
+        } else if (checks > 20) {
+          clearInterval(interval);
+          setIsLoadingLiveChat(false);
+          // If blocked or failed, open mailto support
+          window.location.href = 'mailto:support@fcbsoftware.tech?subject=FCB%20Support%20Request';
         }
-      }, 500);
+      }, 250);
     }
   };
 
@@ -203,11 +225,21 @@ export const SupportChatLauncher: React.FC = () => {
                     <button
                       type="button"
                       id="btn-start-live-chat"
+                      disabled={isLoadingLiveChat}
                       onClick={handleStartLiveChat}
-                      className="w-full py-2 px-3.5 rounded-lg text-xs font-bold text-white bg-violet-600 hover:bg-violet-700 active:bg-violet-800 transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-xs focus:outline-none focus:ring-2 focus:ring-violet-500/40"
+                      className="w-full min-h-[44px] py-2.5 px-3.5 rounded-lg text-xs font-bold text-white bg-violet-600 hover:bg-violet-700 active:bg-violet-800 transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-xs focus:outline-none focus:ring-2 focus:ring-violet-500/40 disabled:opacity-75"
                     >
-                      <span>Start Live Chat</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      {isLoadingLiveChat ? (
+                        <>
+                          <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <span>Connecting...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Start Live Chat</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -241,7 +273,7 @@ export const SupportChatLauncher: React.FC = () => {
                       href={WHATSAPP_URL}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full py-2 px-3.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/40 no-underline"
+                      className="w-full min-h-[44px] py-2 px-3.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/40 no-underline"
                     >
                       <span>Chat on WhatsApp</span>
                       <ExternalLink className="w-3.5 h-3.5" />
@@ -270,7 +302,7 @@ export const SupportChatLauncher: React.FC = () => {
         aria-haspopup="dialog"
         aria-controls="fcb-support-panel"
         aria-label={isOpen ? 'Close support options' : 'Open live support chat options'}
-        className={`group relative flex items-center gap-2.5 px-4 py-3 rounded-full text-white font-semibold text-xs sm:text-sm tracking-wide shadow-xl transition-all duration-200 cursor-pointer focus:outline-none focus:ring-4 focus:ring-violet-500/30 active:scale-95 ${
+        className={`group relative min-h-[46px] min-w-[46px] flex items-center gap-2.5 px-4 py-3 rounded-full text-white font-semibold text-xs sm:text-sm tracking-wide shadow-xl transition-all duration-200 cursor-pointer focus:outline-none focus:ring-4 focus:ring-violet-500/30 active:scale-95 ${
           isOpen
             ? 'bg-slate-900 hover:bg-slate-800 shadow-slate-900/30'
             : 'bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 shadow-violet-600/35 hover:shadow-violet-600/50 hover:-translate-y-0.5'

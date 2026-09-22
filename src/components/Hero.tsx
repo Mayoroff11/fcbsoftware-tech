@@ -120,7 +120,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenLicense, onScrollToFeatures })
             <button
               id="hero-primary-cta"
               onClick={onOpenLicense}
-              className="w-full sm:w-auto px-7 py-3.5 text-sm font-semibold text-white bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-xl transition-all shadow-md shadow-violet-500/25 hover:shadow-xl hover:shadow-violet-500/40 hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer border border-white/20"
+              className="w-full sm:w-auto min-h-[48px] px-7 py-3.5 text-sm font-semibold text-white bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-xl transition-all shadow-md shadow-violet-500/25 hover:shadow-xl hover:shadow-violet-500/40 hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer border border-white/20 active:scale-[0.99]"
             >
               <span>Buy Now</span>
               <ArrowRight className="w-4 h-4" />
@@ -129,7 +129,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenLicense, onScrollToFeatures })
             <button
               id="hero-secondary-cta"
               onClick={scrollToFeatures}
-              className="w-full sm:w-auto px-6 py-3.5 text-sm font-medium text-slate-800 bg-white/80 hover:bg-white border border-white/90 hover:border-violet-300 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs hover:shadow-md hover:shadow-violet-950/5 backdrop-blur-xl hover:-translate-y-0.5"
+              className="w-full sm:w-auto min-h-[48px] px-6 py-3.5 text-sm font-medium text-slate-800 bg-white/80 hover:bg-white border border-white/90 hover:border-violet-300 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs hover:shadow-md hover:shadow-violet-950/5 backdrop-blur-xl hover:-translate-y-0.5 active:scale-[0.99]"
             >
               <span>Explore Features</span>
               <ChevronRight className="w-4 h-4 text-slate-500" />

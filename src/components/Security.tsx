@@ -346,13 +346,13 @@ export const Security: React.FC<SecurityProps> = ({
               </nav>
 
               <div className="pt-3 border-t border-violet-100 space-y-2">
-                <button
-                  onClick={onOpenSupport}
-                  className="w-full py-2 px-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                <a
+                  href="mailto:support@fcbsoftware.tech"
+                  className="w-full py-2 px-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer no-underline"
                 >
                   <MessageSquare className="w-3.5 h-3.5" />
                   <span>Contact Security</span>
-                </button>
+                </a>
               </div>
             </div>
           </aside>
@@ -814,14 +814,14 @@ export const Security: React.FC<SecurityProps> = ({
                     </p>
                   </div>
 
-                  <button
+                  <a
                     id="security-contact-us-btn"
-                    onClick={onOpenSupport}
-                    className="px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-violet-950 bg-white hover:bg-violet-50 shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 shrink-0 self-start sm:self-auto"
+                    href="mailto:support@fcbsoftware.tech"
+                    className="px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-violet-950 bg-white hover:bg-violet-50 shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 shrink-0 self-start sm:self-auto no-underline"
                   >
                     <MessageSquare className="w-4 h-4 text-violet-700" />
                     <span>CONTACT US</span>
-                  </button>
+                  </a>
                 </div>
               </div>
 

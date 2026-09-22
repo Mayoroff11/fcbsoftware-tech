@@ -318,7 +318,7 @@ export const PaymentPage: React.FC<PaymentPageProps> = ({
                   type="button"
                   id="btn-ive-made-payment-primary"
                   onClick={() => setShowVerificationModal(true)}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 transition-all cursor-pointer shadow-md shadow-violet-500/25 flex items-center justify-center gap-1.5 shrink-0 focus:outline-none focus:ring-2 focus:ring-violet-500/40 active:scale-98"
+                  className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 transition-all cursor-pointer shadow-md shadow-violet-500/25 flex items-center justify-center gap-1.5 shrink-0 focus:outline-none focus:ring-2 focus:ring-violet-500/40 active:scale-98"
                 >
                   <span>I've Made This Payment</span>
                   <ArrowRight className="w-3.5 h-3.5" />

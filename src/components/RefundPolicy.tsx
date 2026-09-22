@@ -265,13 +265,13 @@ export const RefundPolicy: React.FC<RefundPolicyProps> = ({
               </nav>
 
               <div className="pt-3 border-t border-violet-100">
-                <button
-                  onClick={onOpenSupport}
-                  className="w-full py-2 px-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                <a
+                  href="mailto:support@fcbsoftware.tech"
+                  className="w-full py-2 px-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer no-underline"
                 >
                   <MessageSquare className="w-3.5 h-3.5" />
                   <span>Contact Support</span>
-                </button>
+                </a>
               </div>
             </div>
           </aside>
@@ -391,14 +391,14 @@ export const RefundPolicy: React.FC<RefundPolicyProps> = ({
                 </div>
 
                 {/* 7. CONTACT SUPPORT PRIMARY CTA */}
-                <button
+                <a
                   id="refund-contact-support-btn"
-                  onClick={onOpenSupport}
-                  className="px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 shadow-md shadow-violet-500/25 hover:shadow-lg hover:shadow-violet-500/35 transition-all cursor-pointer flex items-center justify-center gap-2 border border-white/20 self-start sm:self-auto shrink-0"
+                  href="mailto:support@fcbsoftware.tech"
+                  className="px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 shadow-md shadow-violet-500/25 hover:shadow-lg hover:shadow-violet-500/35 transition-all cursor-pointer flex items-center justify-center gap-2 border border-white/20 self-start sm:self-auto shrink-0 no-underline"
                 >
                   <MessageSquare className="w-4 h-4" />
                   <span>CONTACT SUPPORT</span>
-                </button>
+                </a>
               </div>
 
               <div className="space-y-4">
@@ -496,13 +496,13 @@ export const RefundPolicy: React.FC<RefundPolicyProps> = ({
                   <span>Return to Homepage</span>
                 </button>
 
-                <button
-                  onClick={onOpenSupport}
-                  className="w-full sm:w-auto px-5 py-2 rounded-xl text-xs font-semibold text-white bg-violet-600 hover:bg-violet-700 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+                <a
+                  href="mailto:support@fcbsoftware.tech"
+                  className="w-full sm:w-auto px-5 py-2 rounded-xl text-xs font-semibold text-white bg-violet-600 hover:bg-violet-700 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs no-underline"
                 >
                   <MessageSquare className="w-3.5 h-3.5" />
                   <span>Have questions? Contact Support</span>
-                </button>
+                </a>
               </div>
             </motion.section>
 

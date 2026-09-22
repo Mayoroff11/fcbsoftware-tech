@@ -4,10 +4,10 @@ import { MessageSquare, ArrowRight, Check, Sparkles } from 'lucide-react';
 
 interface FinalCtaProps {
   onOpenLicense: () => void;
-  onOpenSupport: () => void;
+  onOpenSupport?: () => void;
 }
 
-export const FinalCta: React.FC<FinalCtaProps> = ({ onOpenLicense, onOpenSupport }) => {
+export const FinalCta: React.FC<FinalCtaProps> = ({ onOpenLicense }) => {
   const shouldReduceMotion = useReducedMotion();
 
   const handleScrollToPricing = () => {
@@ -71,20 +71,20 @@ export const FinalCta: React.FC<FinalCtaProps> = ({ onOpenLicense, onOpenSupport
             <button
               id="final-cta-view-licenses-btn"
               onClick={handleScrollToPricing}
-              className="w-full sm:w-auto px-8 py-3.5 text-sm font-semibold text-white bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-xl transition-all shadow-md shadow-violet-500/25 hover:shadow-xl hover:shadow-violet-500/40 hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer border border-white/20"
+              className="w-full sm:w-auto min-h-[48px] px-8 py-3.5 text-sm font-semibold text-white bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-xl transition-all shadow-md shadow-violet-500/25 hover:shadow-xl hover:shadow-violet-500/40 hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer border border-white/20 active:scale-[0.99]"
             >
               <span>View Licenses</span>
               <ArrowRight className="w-4 h-4" />
             </button>
 
-            <button
+            <a
               id="final-cta-support-btn"
-              onClick={onOpenSupport}
-              className="w-full sm:w-auto px-7 py-3.5 text-sm font-medium text-slate-800 bg-white/80 hover:bg-white border border-white/90 hover:border-violet-300 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer backdrop-blur-xl shadow-xs hover:shadow-md hover:-translate-y-0.5"
+              href="mailto:support@fcbsoftware.tech"
+              className="w-full sm:w-auto min-h-[48px] px-7 py-3.5 text-sm font-medium text-slate-800 bg-white/80 hover:bg-white border border-white/90 hover:border-violet-300 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer backdrop-blur-xl shadow-xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99]"
             >
               <MessageSquare className="w-4 h-4 text-violet-600" />
               <span>Contact Support</span>
-            </button>
+            </a>
           </div>
 
           {/* Bottom micro-guarantees */}

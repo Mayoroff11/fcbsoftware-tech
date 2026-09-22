@@ -237,19 +237,14 @@ export const CheckoutHeader: React.FC<CheckoutHeaderProps> = ({
                 <span>Refund Policy</span>
               </button>
             )}
-            {onOpenSupport && (
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenSupport();
-                }}
-                className="w-full text-left px-3 py-2 rounded-lg text-slate-700 hover:bg-violet-50 hover:text-violet-700 flex items-center gap-2 cursor-pointer font-medium"
-              >
-                <LifeBuoy className="w-4 h-4 text-violet-600" />
-                <span>Support</span>
-              </button>
-            )}
+            <a
+              href="mailto:support@fcbsoftware.tech"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full text-left px-3 py-2 rounded-lg text-slate-700 hover:bg-violet-50 hover:text-violet-700 flex items-center gap-2 cursor-pointer font-medium no-underline"
+            >
+              <LifeBuoy className="w-4 h-4 text-violet-600" />
+              <span>Support</span>
+            </a>
           </div>
         )}
 
